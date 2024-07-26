@@ -5,8 +5,8 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
 
-  cluster_endpoint_public_access = true
-
+  cluster_endpoint_public_access  = true
+  
 
   cluster_addons = {
     coredns = {
@@ -21,8 +21,8 @@ module "eks" {
   }
 
 
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids               = module.vpc.private_subnets
 
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
@@ -46,7 +46,7 @@ module "eks" {
 
   access_entries = {
     # One access entry with a policy associated
-
+  
   }
 
   tags = {
