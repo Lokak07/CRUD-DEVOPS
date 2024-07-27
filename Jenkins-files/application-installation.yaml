@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    
+     environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = "us-east-1"
+    }
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Lokak07/CRUD-DEVOPS.git']])
+            }
+        }
+        
+        
+         stage('creating namespace') {
+            steps {
+                script {
+                    sh 'aws eks update-kubeconfig --name explore-california-dev-eks-1'
+                    sh 'kubectl create namespace workshop'
+                    
+                }
+            }
+        }
+        
+        
+        stage('Deploying backend') {
+            steps{
+                script{
+                    dir('k8-manifests-project2/mongo') {
+                        sh 'aws eks update-kubeconfig --name explore-california-dev-eks-1'
+                        sh 'kubectl apply -f deploy.yaml'
+                        sh 'kubectl apply -f service.yaml'
+                        sh 'kubectl apply -f secrets.yaml'
+                    }
+                }
+            }
+        }
+        
+        stage('Deploying Frontend') {
+            steps{
+                script{
+                    dir('k8-manifests-project2') {
+                        sh 'aws eks update-kubeconfig --name explore-california-dev-eks-1'
+                        sh 'kubectl apply -f frontend-service.yaml'
+                        sh 'kubectl apply -f frontend-deployment.yaml'
+                    }
+                }
+            }
+        }
+        
+    }
+}
+
