@@ -1,3 +1,3 @@
-name = "explore-california-vpc-eks-1"
-cluster_name = "explore-california-dev-eks-1"
+name = "devopsify-project-vpc"
+cluster_name = "devopsify-project"
 cluster_version = "1.24"
