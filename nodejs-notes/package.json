@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
-    "coverage": "nyc npm test"
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +27,6 @@
   "devDependencies": {
     "dotenv": "^16.0.1",
     "handlebars": "^4.7.7",
-    "nodemon": "^2.0.19",
-    "nyc": "^15.1.0"  
+    "nodemon": "^2.0.19"
   }
 }
