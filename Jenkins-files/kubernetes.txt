@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+    
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = "us-east-1"
+    }
+    
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '*/main']],
+                          userRemoteConfigs: [[url: 'https://github.com/Lokak07/CRUD-DEVOPS.git']]])
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir('eks') {
+                    sh 'terraform init -reconfigure'
+                }
+            }
+        }
+        
+        stage('Terraform FMT') {
+            steps {
+                dir('eks') {
+                    sh 'terraform fmt'
+                }
+            }
+        }
+        
+        stage('Terraform Validate') {
+            steps {
+                dir('eks') {
+                    sh 'terraform validate'
+                }
+            }
+        }
+        
+        stage('Terraform Plan') {
+            steps {
+                dir('eks') {
+                    sh 'terraform plan'
+                }
+            }
+        }
+        
+        stage('Create/Destroy EKS Cluster') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'userInput', message: 'Select an action', parameters: [
+                            choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose apply to create or destroy to delete the EKS cluster')
+                        ]
+                    )
+
+                    dir('eks') {
+                        if (userInput == 'apply') {
+                            sh 'terraform apply -auto-approve'
+                        } else if (userInput == 'destroy') {
+                            sh 'terraform destroy -auto-approve'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
